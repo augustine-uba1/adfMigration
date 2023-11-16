@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "AdvWorksWWMerge",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
