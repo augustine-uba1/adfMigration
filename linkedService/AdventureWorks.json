@@ -1,0 +1,13 @@
+{
+	"name": "AdventureWorks",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "connects to Adventure works SQL database",
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=austineuba.database.windows.net;initial catalog=AdventureWorks2019;user id=austine",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDlENTM0MjI4LTBCMkEtNEQ2Qy1BMjUzLUNENjNCRDM2QTgwQ19iZmIwMDdkNy1kZGEzLTQ4MTctOTU4ZC05NTA4ZjgzNjgxYjIiDQp9"
+		}
+	}
+}
