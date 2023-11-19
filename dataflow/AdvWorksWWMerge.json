@@ -20,7 +20,22 @@
 					"name": "WWImportersDBSource"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "MergeDBProducts",
+						"type": "DatasetReference"
+					},
+					"name": "MergeDBProductsSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "MergeDBClothes",
+						"type": "DatasetReference"
+					},
+					"name": "MergeDBClothesSink"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
 				"source(output(",
@@ -53,7 +68,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> AdvWorksDBSource",
+				"     format: 'table',",
+				"     partitionBy('roundRobin', 2)) ~> AdvWorksDBSource",
 				"source(output(",
 				"          StockItemID as integer,",
 				"          StockItemName as string,",
@@ -84,7 +100,31 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> WWImportersDBSource"
+				"     format: 'table') ~> WWImportersDBSource",
+				"AdvWorksDBSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBProductsSink",
+				"WWImportersDBSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBClothesSink"
 			]
 		}
 	}
