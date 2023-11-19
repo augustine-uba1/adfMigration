@@ -440,6 +440,12 @@
 						},
 						{
 							"name": "DerivedProductType"
+						},
+						{
+							"name": "SelectAdvWorksColumns"
+						},
+						{
+							"name": "SelectWWWImportersColumns"
 						}
 					],
 					"scriptLines": [
@@ -512,8 +518,26 @@
 						"SortByName derive(Cost = UnitPrice * (1+(TaxRate/100)),",
 						"          ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
 						"case(in(['S','M','L','3XL','3XS','4XL','5XL','6XL','7XL','XS','XXS','XL','XXL'], Size), 'Clothing', 'Product')) ~> DerivedFinalCostAndProductType",
-						"FilterDiscontinued derive(ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
+						"SelectAdvWorksColumns derive(ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
 						"case(in(['S','M','L','XL'], Size), 'Clothing', 'Product')) ~> DerivedProductType",
+						"FilterDiscontinued select(mapColumn(",
+						"          Name,",
+						"          Color,",
+						"          Cost = StandardCost,",
+						"          RetailPrice = ListPrice,",
+						"          Size",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectAdvWorksColumns",
+						"DerivedFinalCostAndProductType select(mapColumn(",
+						"          StockItemName,",
+						"          Cost,",
+						"          RetailPrice = RecommendedRetailPrice,",
+						"          Size,",
+						"          ItemType",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectWWWImportersColumns",
 						"DerivedProductType sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
@@ -526,7 +550,7 @@
 						"     skipDuplicateMapOutputs: true,",
 						"     saveOrder: 1,",
 						"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBProductsSink",
-						"DerivedFinalCostAndProductType sink(allowSchemaDrift: true,",
+						"SelectWWWImportersColumns sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
