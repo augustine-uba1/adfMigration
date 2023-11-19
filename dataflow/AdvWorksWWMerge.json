@@ -33,7 +33,7 @@
 						"referenceName": "MergeDBClothes",
 						"type": "DatasetReference"
 					},
-					"name": "MergeDBClotheSink"
+					"name": "MergeDBClothseSink"
 				}
 			],
 			"transformations": [],
@@ -124,7 +124,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     saveOrder: 1,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBClotheSink"
+				"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBClothseSink"
 			]
 		}
 	}
