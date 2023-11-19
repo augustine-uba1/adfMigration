@@ -131,5 +131,6 @@
 			"schema": "Warehouse",
 			"table": "StockItems"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }
