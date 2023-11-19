@@ -431,6 +431,15 @@
 					"transformations": [
 						{
 							"name": "SortByName"
+						},
+						{
+							"name": "FilterDiscontinued"
+						},
+						{
+							"name": "DerivedFinalCostAndProductType"
+						},
+						{
+							"name": "DerivedProductType"
 						}
 					],
 					"scriptLines": [
@@ -499,7 +508,13 @@
 						"     format: 'table') ~> WWImportersDBSource",
 						"WWImportersDBSource sort(asc(StockItemName, true),",
 						"     caseInsensitive: true) ~> SortByName",
-						"AdvWorksDBSource sink(allowSchemaDrift: true,",
+						"AdvWorksDBSource filter(isNull(SellEndDate)) ~> FilterDiscontinued",
+						"SortByName derive(Cost = UnitPrice * (1+(TaxRate/100)),",
+						"          ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
+						"case(in(['S','M','L','3XL','3XS','4XL','5XL','6XL','7XL','XS','XXS','XL','XXL'], Size), 'Clothing', 'Product')) ~> DerivedFinalCostAndProductType",
+						"FilterDiscontinued derive(ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
+						"case(in(['S','M','L','XL'], Size), 'Clothing', 'Product')) ~> DerivedProductType",
+						"DerivedProductType sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -511,7 +526,7 @@
 						"     skipDuplicateMapOutputs: true,",
 						"     saveOrder: 1,",
 						"     errorHandlingOption: 'stopOnFirstError') ~> MergeDBProductsSink",
-						"SortByName sink(allowSchemaDrift: true,",
+						"DerivedFinalCostAndProductType sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
