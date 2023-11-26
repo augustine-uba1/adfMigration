@@ -417,6 +417,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "WWWImportersColorSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "AdventureWorksProducts",
+								"type": "DatasetReference"
+							},
+							"name": "AdvWorksCheckModel"
 						}
 					],
 					"sinks": [
@@ -471,6 +478,9 @@
 						},
 						{
 							"name": "UnionAllProducts"
+						},
+						{
+							"name": "JoinModel"
 						}
 					],
 					"scriptLines": [
@@ -546,6 +556,15 @@
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     query: 'SELECT ColorID, ColorName AS Color from Warehouse.Colors',",
 						"     format: 'query') ~> WWWImportersColorSource",
+						"source(output(",
+						"          ProductModelID as integer,",
+						"          ProductModelName as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'Select ProductModelID, Name as ProductModelName from Production.ProductModel',",
+						"     format: 'query') ~> AdvWorksCheckModel",
 						"WWImportersDBSource sort(asc(StockItemName, true),",
 						"     caseInsensitive: true) ~> SortByName",
 						"AdvWorksDBSource filter(isNull(SellEndDate)) ~> FilterDiscontinued",
@@ -554,7 +573,7 @@
 						"case(in(['S','M','L','3XL','3XS','4XL','5XL','6XL','7XL','XS','XXS','XL','XXL'], Size), 'Clothing', 'Product')) ~> DerivedFinalCostAndProductType",
 						"SelectAdvWorksColumns derive(ItemType = /* This example transformation uses CASE and IN to define if the item is clothing or product */\r",
 						"case(in(['S','M','L','XL'], Size), 'Clothing', 'Product')) ~> DerivedProductType",
-						"FilterDiscontinued select(mapColumn(",
+						"JoinModel select(mapColumn(",
 						"          Name,",
 						"          Color,",
 						"          Cost = StandardCost,",
@@ -586,6 +605,11 @@
 						"     broadcast: 'auto')~> CheckRepeatedClothes",
 						"CheckRepeatedClothes, WWImportersSplitClothesFromProducts@WWImportersClothing union(byName: true)~> UnionAllClothes",
 						"WWImportersSplitClothesFromProducts@WWImportersProduct, AdvWorksSplitClothesFromProducts@AdvworksProducts union(byName: true)~> UnionAllProducts",
+						"FilterDiscontinued, AdvWorksCheckModel join(AdvWorksDBSource@ProductModelID == AdvWorksCheckModel@ProductModelID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> JoinModel",
 						"UnionAllProducts sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
